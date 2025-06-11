@@ -1,0 +1,126 @@
+
+
+Microchip MPLAB XC8 Assembler V2.45 build 20230818022343 
+                                                                                                           Sat Oct 21 14:54:57 2023
+
+
+     1                           	processor	18F47Q10
+     2                           	pagewidth 132
+     3                           	opt	flic
+     4                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank0,global,class=BANK0,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank1,global,class=BANK1,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank2,global,class=BANK2,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank3,global,class=BANK3,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank4,global,class=BANK4,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    16                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    17                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    18                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    19                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    20                           	psect	code,global,reloc=2,class=CODE,delta=1
+    21                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    22                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    23                           
+    24                           ; Configurações do PIC18F47Q10
+    25  0000                     
+    26                           	psect	edata
+    27  0000                     stk_offset	set	0
+    28  0000                     auto_size	set	0
+    29                           
+    30                           ; stack_auto defines a symbol /name/_offset which equates to the
+    31                           ; stack offset of the auto object in question
+    32  0000'                    
+    33                           ; stack_param defines a symbol /name/_offset which equates to the
+    34                           ; stack offset of the parameter object in question
+    35  0000'                    
+    36                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    37                           ; it also links in to the btemp symbol so that can be used
+    38  0000'                    
+    39                           ; restore_stack adjusts the SP to remove all auto and parameter
+    40                           ; objects from the stack prior to returning from a function
+    41  0000'                    
+    42                           ; Definições
+    43                           ; Buffer de transmissão
+    44                           ; Programa principal
+    45                           ; Configurar a UART
+    46  0000' 0E19               	movlw	25	; Carregar valor para cálculo de Baud Rate
+    47  0002' 6F00'              	movwf	SPBRG,b	; Definir Baud Rate para 9600 (com 4000000 ; Frequência do oscilador=4MHz)
+    48                           
+    49                           ; Loop principal
+    50  0004' 0E00               	movlw	0	; Índice do buffer de transmissão
+    51  0006' 6F20               	movwf	(0+32),b	; Inicializar o ponteiro do buffer
+    52                           
+    53                           ; Carregar o próximo caractere para transmitir
+    54  0008' 5130               	movf	(0+48),w,b
+    55  000A' EC00' F000'        	call	SEND_BYTE
+    56                           
+    57                           ; Próximo caractere
+    58  000E' 2B20               	incf	(0+32),f,b
+    59                           
+    60                           ; Verificar se chegamos ao final da mensagem
+    61  0010' 5120               	movf	(0+32),w,b
+    62  0012' 0810               	sublw	16	; Tamanho do buffer de transmissão
+    63  0014' A0D8'              	btfss	status,Z,c
+    64  0016' EF00' F000'        	goto	SEND_LOOP
+    65                           
+    66                           ; Loop infinito
+    67  001A' EF00' F000'        	goto	SEND_LOOP
+    68                           
+    69                           ; Subrotina para enviar um byte pela UART
+    70  001E' D7FF               	goto	($+-1)	; Esperar até que esteja vazio
+    71  0020' 6F00'              	movwf	TXREG,b	; Enviar o byte
+    72  0022' 0012               	return	
+    73                           
+    74                           ; Mensagem para enviar
+    75  0000                     tosu	equ	0xFFF
+    76                           tosh	equ	0xFFE
+    77                           tosl	equ	0xFFD
+    78                           stkptr	equ	0xFFC
+    79                           pclatu	equ	0xFFB
+    80                           pclath	equ	0xFFA
+    81                           pcl	equ	0xFF9
+    82                           tblptru	equ	0xFF8
+    83                           tblptrh	equ	0xFF7
+    84                           tblptrl	equ	0xFF6
+    85                           tablat	equ	0xFF5
+    86                           prodh	equ	0xFF4
+    87                           prodl	equ	0xFF3
+    88                           indf0	equ	0xFEF
+    89                           postinc0	equ	0xFEE
+    90                           postdec0	equ	0xFED
+    91                           preinc0	equ	0xFEC
+    92                           plusw0	equ	0xFEB
+    93                           fsr0h	equ	0xFEA
+    94                           fsr0l	equ	0xFE9
+    95                           wreg	equ	0xFE8
+    96                           indf1	equ	0xFE7
+    97                           postinc1	equ	0xFE6
+    98                           postdec1	equ	0xFE5
+    99                           preinc1	equ	0xFE4
+   100                           plusw1	equ	0xFE3
+   101                           fsr1h	equ	0xFE2
+   102                           fsr1l	equ	0xFE1
+   103                           bsr	equ	0xFE0
+   104                           indf2	equ	0xFDF
+   105                           postinc2	equ	0xFDE
+   106                           postdec2	equ	0xFDD
+   107                           preinc2	equ	0xFDC
+   108                           plusw2	equ	0xFDB
+   109                           fsr2h	equ	0xFDA
+   110                           fsr2l	equ	0xFD9
+   111                           status	equ	0xFD8
+
+
+Microchip Technology PIC18 Macro Assembler V2.45 build 20230818022343 
+Symbol Table                                                                                               Sat Oct 21 14:54:57 2023
+
+                              Z 0000*                           SPBRG 0000*                           TXREG 0000* 
+                         STATUS 0FD8                          isa$std 0001                         TXBuffer 0030  
+                      SEND_BYTE 0000*                       SEND_LOOP 0000*                       isa$xinst 0000  
+                    TXBufferPtr 0020  
