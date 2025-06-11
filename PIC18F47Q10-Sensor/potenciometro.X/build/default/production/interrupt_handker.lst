@@ -1,0 +1,152 @@
+
+
+Microchip MPLAB XC8 Assembler V2.45 build 20230818022343 
+                                                                                                           Wed Nov 01 23:22:17 2023
+
+
+     1                           	processor	18F47Q10
+     2                           	pagewidth 132
+     3                           	opt	flic
+     4                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank0,global,class=BANK0,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank1,global,class=BANK1,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank2,global,class=BANK2,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank3,global,class=BANK3,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank4,global,class=BANK4,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    16                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    17                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    18                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    19                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    20                           	psect	code,global,reloc=2,class=CODE,delta=1
+    21                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    22                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    23                           	psect	intcode,global,delta=1
+    24  0000                     
+    25                           	psect	edata
+    26  0000                     stk_offset	set	0
+    27  0000                     auto_size	set	0
+    28                           
+    29                           ; stack_auto defines a symbol /name/_offset which equates to the
+    30                           ; stack offset of the auto object in question
+    31  0000'                    
+    32                           ; stack_param defines a symbol /name/_offset which equates to the
+    33                           ; stack offset of the parameter object in question
+    34  0000'                    
+    35                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    36                           ; it also links in to the btemp symbol so that can be used
+    37  0000'                    
+    38                           ; restore_stack adjusts the SP to remove all auto and parameter
+    39                           ; objects from the stack prior to returning from a function
+    40  0000'                    
+    41                           	psect	intcode
+    42  0000'                    _int_handler:
+    43                           	callstack 0
+    44                           
+    45                           ; when an interrupt happens, this function is called. It is your
+    46                           ;job to verify what interrupt happened and act accordingly
+    47  0000' 010E               	banksel	3781	;taxa de amostragem
+    48  0002' BBC5               	btfsc	3781,5,b	; Q:check if the timer0 interrupt flag is set (se esta a 1)->se tiver houve uma inte
+      +                          rrupção->timer no maximo-> temos de dar reset.
+    49                           
+    50                           ;If so, go to timer0_int_handler. If not, skip.
+    51  0004' D008               	goto	_timer0_int_handler	;so realiza isto se tiver 1; se nao salta pra seguinte
+    52  0006' 010E               	banksel	3782	;quando PIR0=0 passa para aqui ; PIR1 é do ADC; se tiver PIR1=1 -> interrupção do ADC
+    53  0008' B1C6               	btfsc	3782,0,b	; Q: Check if the ADC interrupt flag is set. If so, go to
+    54                           
+    55                           ; _getch. If not, skip.
+    56  000A' D00B               	goto	_adc_int_handler
+    57                           
+    58                           ; quando a anterio esta a zero; PIR1=0
+    59  000C' 010E               	banksel	3784	; PIR3 É a flag do RX--> pc pro micro
+    60  000E' BBC8               	btfsc	3784,5,b	; PIR3=1 (bit 5) realiza esta instrução
+    61                           
+    62                           ; Q: check if the EUSART1 RC GLAG IS SER
+    63  0010' EC00' F000'        	call	_getch	; esta na main
+    64  0014' 0010               	retfie	
+    65  0016'                    _timer0_int_handler:
+    66  0016' 010F               	banksel	3931	; registro do controlo de ADC --> qd o timer chega ao maximo
+    67                           
+    68                           ; --> dá o print da conversão
+    69  0018' 815B               	bsf	3931,0,b	; É aqui que faz a conversao de anaofioc --> digital --> adc-->set
+    70                           
+    71                           ; Q: WE CAN USE THE TIMR ((STATUS) and 0FFh), 6, a CONTROL THE ADC SAMPLING RATE STAR AN ADC CONVERS
+      +                          ION HERE
+    72  001A' 7A8C               	btg	3980,5,c	; TOGGLE LED ON PROTA, 5
+    73                           
+    74                           ;-> ta a inverter o sinal -> liga desligado , liga. ou seja, cada vez que o led pisca o tempo acaba
+    75                           ;-> cada vez que o timer acaba, o led pisca
+    76  001C' 010E               	banksel	3781	; PIR0 pq a interrupçao foi feita e o PIR0 esta a 1
+    77  001E' 9BC5               	bcf	3781,5,b	;clear timer_int flag ; queremos dar resert ao PIR0 e fica a 0
+    78  0020' 0010               	retfie		; return from interruption ; volta a instruçao de cima
+    79  0022'                    _adc_int_handler:
+    80  0022' 010F               	banksel	3935	; registro do resultado, quando faz a conversão vai para
+    81                           
+    82                           ;AQUI ; H--> HIGHEST
+    83  0024' CF5F F000          	movff	3935,0	; put the highest 8 bits of the conversion result in 0
+    84                           
+    85                           ; ESTAMOS A GUARDAR OS 8 BITS CONVERTIDOS NO PARCEL
+    86                           ; here Iam just changing the value of the byte read by the ADC converion in the UART TX
+    87                           ; DEBUG PURPOSES
+    88  0028' 0EFF               	movlw	255
+    89  002A' 6E00               	movwf	0,c
+    90  002C' 010F               	banksel	3993	;REGISTRO DO TX
+    91  002E' C000 FF99          	movff	0,3993
+    92                           
+    93                           ;passamos os 8 bits para o registro do TX
+    94                           ;Q: put the 8 MSB of the ADC conversion in the UART TX.
+    95  0032' 010E               	banksel	3782
+    96  0034' 91C6               	bcf	3782,0,b	;clear the ADC interrupt flag ;volta o PIR1 a zero
+    97  0036' 0010               	retfie		;return from interruption ;volta pra cima
+    98                           tosu	equ	0xFFF
+    99                           tosh	equ	0xFFE
+   100                           tosl	equ	0xFFD
+   101                           stkptr	equ	0xFFC
+   102                           pclatu	equ	0xFFB
+   103                           pclath	equ	0xFFA
+   104                           pcl	equ	0xFF9
+   105                           tblptru	equ	0xFF8
+   106                           tblptrh	equ	0xFF7
+   107                           tblptrl	equ	0xFF6
+   108                           tablat	equ	0xFF5
+   109                           prodh	equ	0xFF4
+   110                           prodl	equ	0xFF3
+   111                           indf0	equ	0xFEF
+   112                           postinc0	equ	0xFEE
+   113                           postdec0	equ	0xFED
+   114                           preinc0	equ	0xFEC
+   115                           plusw0	equ	0xFEB
+   116                           fsr0h	equ	0xFEA
+   117                           fsr0l	equ	0xFE9
+   118                           wreg	equ	0xFE8
+   119                           indf1	equ	0xFE7
+   120                           postinc1	equ	0xFE6
+   121                           postdec1	equ	0xFE5
+   122                           preinc1	equ	0xFE4
+   123                           plusw1	equ	0xFE3
+   124                           fsr1h	equ	0xFE2
+   125                           fsr1l	equ	0xFE1
+   126                           bsr	equ	0xFE0
+   127                           indf2	equ	0xFDF
+   128                           postinc2	equ	0xFDE
+   129                           postdec2	equ	0xFDD
+   130                           preinc2	equ	0xFDC
+   131                           plusw2	equ	0xFDB
+   132                           fsr2h	equ	0xFDA
+   133                           fsr2l	equ	0xFD9
+   134                           status	equ	0xFD8
+
+
+Microchip Technology PIC18 Macro Assembler V2.45 build 20230818022343 
+Symbol Table                                                                                               Wed Nov 01 23:22:17 2023
+
+                           PIR0 0EC5                             PIR1 0EC6                             PIR3 0EC8  
+                          PORTA 0F8C                           ADCON0 0F5B                           ADRESH 0F5F  
+                         TX1REG 0F99                           _getch 0000*                         isa$std 0001  
+            _timer0_int_handler 0016                 _adc_int_handler 0022                     _int_handler 0000  
+                      isa$xinst 0000  

@@ -1,0 +1,117 @@
+
+
+Microchip MPLAB XC8 Assembler V2.45 build 20230818022343 
+                                                                                                           Thu Dec 21 13:50:04 2023
+
+
+     1                           	processor	18F47Q10
+     2                           	pagewidth 132
+     3                           	opt	flic
+     4                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank0,global,class=BANK0,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank1,global,class=BANK1,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank2,global,class=BANK2,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank3,global,class=BANK3,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank4,global,class=BANK4,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    16                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    17                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    18                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    19                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    20                           	psect	code,global,reloc=2,class=CODE,delta=1
+    21                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    22                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    23                           	psect	intcode,global,delta=1
+    24   000000                     
+    25                           	psect	edata
+    26   000000                     stk_offset	set	0
+    27   000000                     auto_size	set	0
+    28                           
+    29                           ; stack_auto defines a symbol /name/_offset which equates to the
+    30                           ; stack offset of the auto object in question
+    31   000000                     
+    32                           ; stack_param defines a symbol /name/_offset which equates to the
+    33                           ; stack offset of the parameter object in question
+    34   000000                     
+    35                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    36                           ; it also links in to the btemp symbol so that can be used
+    37   000000                     
+    38                           ; restore_stack adjusts the SP to remove all auto and parameter
+    39                           ; objects from the stack prior to returning from a function
+    40   000000                     
+    41                           	psect	intcode
+    42   000008                     _int_handler:
+    43                           	callstack 0
+    44   000008  010E               	banksel	3781
+    45   00000A  BBC5               	btfsc	3781,5,b	;tava a 0 antes
+    46   00000C  D006               	goto	_timer0_int_handler
+    47   00000E  010E               	banksel	3782
+    48   000010  B1C6               	btfsc	3782,0,b
+    49   000012  D008               	goto	_adc_int_handler
+    50   000014  EC2B  F01C         	call	_getch
+    51   000018  0010               	retfie	
+    52   00001A                     _timer0_int_handler:
+    53   00001A  010F               	banksel	3931
+    54   00001C  815B               	bsf	3931,0,b
+    55   00001E  010E               	banksel	3781
+    56   000020  9BC5               	bcf	3781,5,b
+    57   000022  0010               	retfie	
+    58   000024                     _adc_int_handler:
+    59   000024  010F               	banksel	3934
+    60   000026  CF5E F000          	movff	3934,0
+    61   00002A  010F               	banksel	3993
+    62   00002C  C000 FF99          	movff	0,3993
+    63   000030  010E               	banksel	3782
+    64   000032  91C6               	bcf	3782,0,b
+    65   000034  0010               	retfie	
+    66                           tosu	equ	0xFFF
+    67                           tosh	equ	0xFFE
+    68                           tosl	equ	0xFFD
+    69                           stkptr	equ	0xFFC
+    70                           pclatu	equ	0xFFB
+    71                           pclath	equ	0xFFA
+    72                           pcl	equ	0xFF9
+    73                           tblptru	equ	0xFF8
+    74                           tblptrh	equ	0xFF7
+    75                           tblptrl	equ	0xFF6
+    76                           tablat	equ	0xFF5
+    77                           prodh	equ	0xFF4
+    78                           prodl	equ	0xFF3
+    79                           indf0	equ	0xFEF
+    80                           postinc0	equ	0xFEE
+    81                           postdec0	equ	0xFED
+    82                           preinc0	equ	0xFEC
+    83                           plusw0	equ	0xFEB
+    84                           fsr0h	equ	0xFEA
+    85                           fsr0l	equ	0xFE9
+    86                           wreg	equ	0xFE8
+    87                           indf1	equ	0xFE7
+    88                           postinc1	equ	0xFE6
+    89                           postdec1	equ	0xFE5
+    90                           preinc1	equ	0xFE4
+    91                           plusw1	equ	0xFE3
+    92                           fsr1h	equ	0xFE2
+    93                           fsr1l	equ	0xFE1
+    94                           bsr	equ	0xFE0
+    95                           indf2	equ	0xFDF
+    96                           postinc2	equ	0xFDE
+    97                           postdec2	equ	0xFDD
+    98                           preinc2	equ	0xFDC
+    99                           plusw2	equ	0xFDB
+   100                           fsr2h	equ	0xFDA
+   101                           fsr2l	equ	0xFD9
+   102                           status	equ	0xFD8
+
+
+Microchip Technology PIC18 Macro Assembler V2.45 build 20230818022343 
+Symbol Table                                                                                               Thu Dec 21 13:50:04 2023
+
+                           PIR0 0EC5                             PIR1 0EC6                           ADCON0 0F5B  
+                         ADRESL 0F5E                           TX1REG 0F99                           _getch 3856  
+                        isa$std 0001              _timer0_int_handler 001A                 _adc_int_handler 0024  
+                   _int_handler 0008                        isa$xinst 0000               _identify_NCAP_cmd 1C00  

@@ -1,0 +1,104 @@
+
+
+Microchip MPLAB XC8 Assembler V2.45 build 20230818022343 
+                                                                                                           Thu Dec 21 13:50:04 2023
+
+
+     1                           	processor	18F47Q10
+     2                           	pagewidth 132
+     3                           	opt	flic
+     4                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank0,global,class=BANK0,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank1,global,class=BANK1,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank2,global,class=BANK2,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank3,global,class=BANK3,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank4,global,class=BANK4,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    16                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    17                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    18                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    19                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    20                           	psect	code,global,reloc=2,class=CODE,delta=1
+    21                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    22                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    23                           	psect	intcode,global,delta=1
+    24   000000                     
+    25                           	psect	edata
+    26   000000                     stk_offset	set	0
+    27   000000                     auto_size	set	0
+    28                           
+    29                           ; stack_auto defines a symbol /name/_offset which equates to the
+    30                           ; stack offset of the auto object in question
+    31   000000                     
+    32                           ; stack_param defines a symbol /name/_offset which equates to the
+    33                           ; stack offset of the parameter object in question
+    34   000000                     
+    35                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    36                           ; it also links in to the btemp symbol so that can be used
+    37   000000                     
+    38                           ; restore_stack adjusts the SP to remove all auto and parameter
+    39                           ; objects from the stack prior to returning from a function
+    40   000000                     
+    41                           	psect	intcode
+    42   000036                     _LED5_ON:
+    43                           	callstack 0
+    44   000036  8A8C               	bsf	3980,5,c
+    45   000038                     _LED5_OFF:
+    46                           	callstack 0
+    47   000038  9A8C               	bcf	3980,5,c
+    48   00003A                     _LED6_ON:
+    49                           	callstack 0
+    50   00003A  8C8C               	bsf	3980,6,c
+    51   00003C                     _LED6_OFF:
+    52                           	callstack 0
+    53   00003C  9C8C               	bcf	3980,6,c
+    54                           tosu	equ	0xFFF
+    55                           tosh	equ	0xFFE
+    56                           tosl	equ	0xFFD
+    57                           stkptr	equ	0xFFC
+    58                           pclatu	equ	0xFFB
+    59                           pclath	equ	0xFFA
+    60                           pcl	equ	0xFF9
+    61                           tblptru	equ	0xFF8
+    62                           tblptrh	equ	0xFF7
+    63                           tblptrl	equ	0xFF6
+    64                           tablat	equ	0xFF5
+    65                           prodh	equ	0xFF4
+    66                           prodl	equ	0xFF3
+    67                           indf0	equ	0xFEF
+    68                           postinc0	equ	0xFEE
+    69                           postdec0	equ	0xFED
+    70                           preinc0	equ	0xFEC
+    71                           plusw0	equ	0xFEB
+    72                           fsr0h	equ	0xFEA
+    73                           fsr0l	equ	0xFE9
+    74                           wreg	equ	0xFE8
+    75                           indf1	equ	0xFE7
+    76                           postinc1	equ	0xFE6
+    77                           postdec1	equ	0xFE5
+    78                           preinc1	equ	0xFE4
+    79                           plusw1	equ	0xFE3
+    80                           fsr1h	equ	0xFE2
+    81                           fsr1l	equ	0xFE1
+    82                           bsr	equ	0xFE0
+    83                           indf2	equ	0xFDF
+    84                           postinc2	equ	0xFDE
+    85                           postdec2	equ	0xFDD
+    86                           preinc2	equ	0xFDC
+    87                           plusw2	equ	0xFDB
+    88                           fsr2h	equ	0xFDA
+    89                           fsr2l	equ	0xFD9
+    90                           status	equ	0xFD8
+
+
+Microchip Technology PIC18 Macro Assembler V2.45 build 20230818022343 
+Symbol Table                                                                                               Thu Dec 21 13:50:04 2023
+
+                          PORTA 0F8C                          isa$std 0001                         _LED5_ON 0036  
+                       _LED6_ON 003A                        _LED5_OFF 0038                        _LED6_OFF 003C  
+                      isa$xinst 0000  
