@@ -1,0 +1,107 @@
+
+
+Microchip MPLAB XC8 Assembler V2.45 build 20230818022343 
+                                                                                                           Thu Oct 12 09:03:35 2023
+
+
+     1                           	processor	18F47Q10
+     2                           	pagewidth 132
+     3                           	opt	flic
+     4                           	psect	udata_acs,global,class=COMRAM,space=1,delta=1,lowdata,noexec
+     5                           	psect	udata_bank0,global,class=BANK0,space=1,delta=1,lowdata,noexec
+     6                           	psect	udata_bank1,global,class=BANK1,space=1,delta=1,lowdata,noexec
+     7                           	psect	udata_bank2,global,class=BANK2,space=1,delta=1,lowdata,noexec
+     8                           	psect	udata_bank3,global,class=BANK3,space=1,delta=1,lowdata,noexec
+     9                           	psect	udata_bank4,global,class=BANK4,space=1,delta=1,lowdata,noexec
+    10                           	psect	udata_bank5,global,class=BANK5,space=1,delta=1,lowdata,noexec
+    11                           	psect	udata_bank6,global,class=BANK6,space=1,delta=1,lowdata,noexec
+    12                           	psect	udata_bank7,global,class=BANK7,space=1,delta=1,lowdata,noexec
+    13                           	psect	udata_bank8,global,class=BANK8,space=1,delta=1,lowdata,noexec
+    14                           	psect	udata_bank9,global,class=BANK9,space=1,delta=1,lowdata,noexec
+    15                           	psect	udata_bank10,global,class=BANK10,space=1,delta=1,lowdata,noexec
+    16                           	psect	udata_bank11,global,class=BANK11,space=1,delta=1,lowdata,noexec
+    17                           	psect	udata_bank12,global,class=BANK12,space=1,delta=1,lowdata,noexec
+    18                           	psect	udata_bank14,global,class=BANK14,space=1,delta=1,lowdata,noexec
+    19                           	psect	udata,global,class=RAM,space=1,delta=1,noexec
+    20                           	psect	code,global,reloc=2,class=CODE,delta=1
+    21                           	psect	data,global,reloc=2,class=CONST,delta=1,noexec
+    22                           	psect	edata,global,class=EEDATA,space=3,delta=1,noexec
+    23                           	psect	barfunc,local,class=CODE,delta=2
+    24   000000                     
+    25                           	psect	edata
+    26   000000                     stk_offset	set	0
+    27   000000                     auto_size	set	0
+    28                           
+    29                           ; stack_auto defines a symbol /name/_offset which equates to the
+    30                           ; stack offset of the auto object in question
+    31   000000                     
+    32                           ; stack_param defines a symbol /name/_offset which equates to the
+    33                           ; stack offset of the parameter object in question
+    34   000000                     
+    35                           ; alloc_stack adjusts the SP to allocate space for auto objects
+    36                           ; it also links in to the btemp symbol so that can be used
+    37   000000                     
+    38                           ; restore_stack adjusts the SP to remove all auto and parameter
+    39                           ; objects from the stack prior to returning from a function
+    40   000000                     
+    41                           ; When assembly code is placed in a psect, it can be manipulated as a
+    42                           ; whole by the linker and placed in memory.
+    43                           ;
+    44                           ; In this example, barfunc is the program section (psect) name, 'local' means
+    45                           ; that the section will not be combined with other sections even if they have
+    46                           ; the same name. class=CODE means the barfunc must go in the CODE container.
+    47                           ; PIC18's should have a delta (addressible unit size) of 1 (default) since they
+    48                           ; are byte addressible. PIC10/12/16's have a delta of 2 since they are word
+    49                           ; addressible. PIC18's should have a reloc (alignment) flag of 2 for any
+    50                           ; psect which contains executable code. PIC10/12/16's can use the default
+    51                           ; reloc value of 1. Use one of the psects below for the device you use:
+    52                           
+    53                           	psect	barfunc
+    54   0030A4                     _bar:
+    55                           	callstack 0
+    56   0030A4  508C               	movf	3980,w,c	; here we use a symbol defined via xc.inc
+    57   0030A5  0012               	return	
+    58                           tosu	equ	0xFFF
+    59                           tosh	equ	0xFFE
+    60                           tosl	equ	0xFFD
+    61                           stkptr	equ	0xFFC
+    62                           pclatu	equ	0xFFB
+    63                           pclath	equ	0xFFA
+    64                           pcl	equ	0xFF9
+    65                           tblptru	equ	0xFF8
+    66                           tblptrh	equ	0xFF7
+    67                           tblptrl	equ	0xFF6
+    68                           tablat	equ	0xFF5
+    69                           prodh	equ	0xFF4
+    70                           prodl	equ	0xFF3
+    71                           indf0	equ	0xFEF
+    72                           postinc0	equ	0xFEE
+    73                           postdec0	equ	0xFED
+    74                           preinc0	equ	0xFEC
+    75                           plusw0	equ	0xFEB
+    76                           fsr0h	equ	0xFEA
+    77                           fsr0l	equ	0xFE9
+    78                           wreg	equ	0xFE8
+    79                           indf1	equ	0xFE7
+    80                           postinc1	equ	0xFE6
+    81                           postdec1	equ	0xFE5
+    82                           preinc1	equ	0xFE4
+    83                           plusw1	equ	0xFE3
+    84                           fsr1h	equ	0xFE2
+    85                           fsr1l	equ	0xFE1
+    86                           bsr	equ	0xFE0
+    87                           indf2	equ	0xFDF
+    88                           postinc2	equ	0xFDE
+    89                           postdec2	equ	0xFDD
+    90                           preinc2	equ	0xFDC
+    91                           plusw2	equ	0xFDB
+    92                           fsr2h	equ	0xFDA
+    93                           fsr2l	equ	0xFD9
+    94                           status	equ	0xFD8
+
+
+Microchip Technology PIC18 Macro Assembler V2.45 build 20230818022343 
+Symbol Table                                                                                               Thu Oct 12 09:03:35 2023
+
+                           _bar 30A4                            PORTA 0F8C                          isa$std 0001  
+                      isa$xinst 0000  
